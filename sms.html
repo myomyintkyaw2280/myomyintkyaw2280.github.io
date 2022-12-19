@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta http-equiv="X-UA-Compatible" content="ie=edge" />
+    <title>Document</title>
+    <!-- <script src="https://www.google.com/recaptcha/api.js"></script> -->
+  </head>
+  <body>
+    <!-- Add two inputs for "phoneNumber" and "code" -->
+    <input type="tel" id="phoneNumber" value="+959425030932 789838897" placeholder="enter phone number" />
+
+    <!-- Add two buttons to submit the inputs -->
+    <button id="sign-in-button" onclick="submitPhoneNumberAuth()" class="g-recaptcha" data-sitekey="6Lc4Go4jAAAAAJzKD93b_ghchko2zGwUHzUhBGMD"  data-callback='onSubmit' data-action='submit' >
+      SIGN IN WITH PHONE
+    </button>
+    <br><br>
+    <input type="text" id="code" placeholder="enter verify code" />
+    <button id="confirm-code" onclick="submitPhoneNumberAuthCode()">
+      ENTER CODE
+    </button>
+      <!-- locahost: 6Ld0HY4jAAAAANlkAT539Z26RQEQuRoIxRBh-E_o
+  secret: 6Ld0HY4jAAAAAALhNfuYNwMo2QCCd3yiaqonTQPy
+  .pro :6Lc4Go4jAAAAAJzKD93b_ghchko2zGwUHzUhBGMD
+  old:6Ld1_KAaAAAAAMvjdB8riUpxyPCaZyDHDps8T8vT -->
+    <!-- Add a container for reCaptcha -->
+    <div id="recaptcha-container"></div>
+
+    <script src="https://www.google.com/recaptcha/api.js"></script>
+    <!-- The core Firebase JS SDK is always required and must be listed first -->
+    <script src="https://www.gstatic.com/firebasejs/8.3.2/firebase-app.js"></script>
+    
+    <!-- Add Firebase products that you want to use -->
+    <script src="https://www.gstatic.com/firebasejs/8.3.2/firebase-auth.js"></script>
+
+    <!-- TODO: Add SDKs for Firebase products that you want to use
+         https://firebase.google.com/docs/web/setup#available-libraries -->
+    <script src="https://www.gstatic.com/firebasejs/8.3.2/firebase-analytics.js"></script>
+
+    <script>
+       // Your web app's Firebase configuration
+      // For Firebase JS SDK v7.20.0 and later, measurementId is optional
+      var firebaseConfig = {
+        apiKey: "AIzaSyDhwNJDq1ZXfKpMF9K0Zu0H0elkUiUYpws",
+        authDomain: "fireb-phone-auth.firebaseapp.com",
+        projectId: "fireb-phone-auth",
+        storageBucket: "fireb-phone-auth.appspot.com",
+        messagingSenderId: "379447487979",
+        appId: "1:379447487979:web:fd40a7b8eccb143a077dae",
+        measurementId: "G-FFJKG21FZD"
+      };
+      // Initialize Firebase
+      firebase.initializeApp(firebaseConfig);
+      firebase.analytics();
+    //   const recaptchaResponse = grecaptcha.getResponse(window.recaptchaWidgetId);
+      // Create a Recaptcha verifier instance globally
+      // Calls submitPhoneNumberAuth() when the captcha is verified
+      window.recaptchaVerifier = new firebase.auth.RecaptchaVerifier(
+        "recaptcha-container",
+        {
+          size: "normal",
+          callback: function(response) {
+            submitPhoneNumberAuth();
+          }
+        }
+      );
+      firebase.auth().useDeviceLanguage();
+
+      
+      // This function runs when the 'sign-in-button' is clicked
+      // Takes the value from the 'phoneNumber' input and sends SMS to that phone number
+      function submitPhoneNumberAuth() {
+        var phoneNumber = translate(document.getElementById("phoneNumber").value);
+        console.log(phoneNumber);
+        // var appVerifier = window.recaptchaVerifier;
+        // firebase
+        //   .auth()
+        //   .signInWithPhoneNumber(phoneNumber, appVerifier)
+        //   .then(function(confirmationResult) {
+        //     window.confirmationResult = confirmationResult;
+        //   })
+        //   .catch(function(error) {
+        //     console.log(error);
+        //   });
+      }
+
+      // This function runs when the 'confirm-code' button is clicked
+      // Takes the value from the 'code' input and submits the code to verify the phone number
+      // Return a user object if the authentication was successful, and auth is complete
+      function submitPhoneNumberAuthCode() {
+        var code = document.getElementById("code").value;
+        confirmationResult
+          .confirm(code)
+          .then(function(result) {
+            var user = result.user;
+            console.log(user);
+          })
+          .catch(function(error) {
+            console.log(error);
+          });
+      }
+
+      //This function runs everytime the auth state changes. Use to verify if the user is logged in
+      firebase.auth().onAuthStateChanged(function(user) {
+        if (user) {
+          console.log(user);
+          console.log("USER LOGGED IN");
+        } else {
+          // No user is signed in.
+          console.log("USER NOT LOGGED IN");
+        }
+      });
+      function translate(text, lang='en'){
+        // console.log("input number is "+text);
+        
+        var enDigits = { '၀':'0', '၁':'1', '၂':'2', '၃':'3', '၄':'4', '၅':'5', '၆':'6', '၇':'7', '၈':'8', '၉':'9'};
+        var mmDigits = { '0':'၀', '1':'၁', '2':'၂', '3':'၃', '4':'၄', '5':'၅', '6':'၆', '7':'၇', '8':'၈', '9':'၉'};
+        if(lang == 'mm'){
+          /* Converting English number to Myanmar (js) */
+          var result = text.toString().replace(/[0123456789]/g, function(s) {
+                       return mmDigits[s]; // ၀၁၂၃၄၅၆၇၈၉
+                    });
+        }
+        else{
+          /* Converting Myanmar number to English (js) */
+          var result = text.replace(/[၀၁၂၃၄၅၆၇၈၉]/g, function(s) {
+                      return enDigits[s]; // 1234567890
+                  });
+        }
+        return result;
+        // Output: lang
+        // document.getElementById("result").innerHTML = lang.toUpperCase()+" number  is "+result;
+      }
+    </script>
+  </body>
+</html>
